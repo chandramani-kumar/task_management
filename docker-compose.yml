@@ -1,0 +1,39 @@
+# The 'version' attribute is obsolete and can be removed.
+services:
+
+  frontend:
+    build:
+      context: ./task-ui-app # Path to the frontend code and Dockerfile
+    container_name: task-tool-frontend
+    ports:
+      - "3001:80" # Map host port 3000 to the container's port 80 (Nginx)
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./demo # Path to the backend code and Dockerfile
+    container_name: task-tool-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/taskdb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+
+  postgres-db: # This is the service name
+    image: postgres:16
+    container_name: my_postgres_container
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=taskdb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
